@@ -87,5 +87,11 @@ export function generatePassword(): string {
   for (let i = 0; i < length; i++) {
     password += charset[randomValues[i] % charset.length];
   }
+  
+  // Shuffle for more randomness
+  const shuffleArray = new Uint32Array(length);
+  crypto.getRandomValues(shuffleArray);
+  password = password.split('').sort(() => (shuffleArray[0] % 3) - 1).join('');
+
   return password;
 }
