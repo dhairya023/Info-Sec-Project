@@ -112,6 +112,7 @@ export function PdfLocker() {
       if (operation === "lock") {
         outputBuffer = await encrypt(fileBuffer, password);
         outputFileName = `${file.name}.bin`;
+        // Show the password warning if the passwords match and are not empty
         if (password === confirmPassword && password.length > 0) {
             setGeneratedPassword(password);
         }
@@ -131,7 +132,7 @@ export function PdfLocker() {
       a.href = url;
       a.download = outputFileName;
       document.body.appendChild(a);
-a.click();
+      a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
