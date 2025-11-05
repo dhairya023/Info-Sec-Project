@@ -20,8 +20,14 @@ import {
   ShieldCheck,
   AlertTriangle,
 } from "lucide-react";
+import { Accept } from "react-dropzone";
 
 type Operation = "lock" | "unlock";
+
+const acceptTypes: Record<Operation, Accept> = {
+    lock: { "application/pdf": [".pdf"] },
+    unlock: { "application/octet-stream": [".bin"] },
+};
 
 export function PdfLocker() {
   const [file, setFile] = useState<File | null>(null);
@@ -29,17 +35,31 @@ export function PdfLocker() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<Operation>("lock");
   const { toast } = useToast();
 
   const handleFileAccepted = (acceptedFile: File) => {
-    if (acceptedFile.type !== "application/pdf") {
-      toast({
-        title: "Invalid File Type",
-        description: "Please upload a valid PDF file.",
-        variant: "destructive",
-      });
-      return;
+    const expectedType = activeTab === 'lock' ? 'application/pdf' : 'application/octet-stream';
+    const fileExtension = acceptedFile.name.split('.').pop()?.toLowerCase();
+
+    if (activeTab === 'lock' && acceptedFile.type !== expectedType) {
+        toast({
+            title: "Invalid File Type",
+            description: "Please upload a valid PDF file for locking.",
+            variant: "destructive",
+        });
+        return;
     }
+    
+    if (activeTab === 'unlock' && fileExtension !== 'bin') {
+        toast({
+            title: "Invalid File Type",
+            description: "Please upload a .bin file for unlocking.",
+            variant: "destructive",
+        });
+        return;
+    }
+
     setFile(acceptedFile);
   };
 
@@ -111,7 +131,7 @@ export function PdfLocker() {
       a.href = url;
       a.download = outputFileName;
       document.body.appendChild(a);
-      a.click();
+a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
@@ -173,7 +193,8 @@ export function PdfLocker() {
     </div>
   );
 
-  const resetState = () => {
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as Operation);
     setFile(null);
     setPassword("");
     setConfirmPassword("");
@@ -182,7 +203,7 @@ export function PdfLocker() {
 
   return (
     <Card className="w-full bg-white dark:bg-gray-950 shadow-lg border-gray-200 dark:border-gray-800">
-      <Tabs defaultValue="lock" className="w-full" onValueChange={resetState}>
+      <Tabs defaultValue="lock" className="w-full" onValueChange={handleTabChange}>
         <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-900">
           <TabsTrigger value="lock">
             <Lock className="mr-2 h-4 w-4" />
@@ -195,7 +216,7 @@ export function PdfLocker() {
         </TabsList>
         <TabsContent value="lock">
           <CardContent className="space-y-6 pt-6">
-            <FileDropzone onFileAccepted={handleFileAccepted} file={file} />
+            <FileDropzone onFileAccepted={handleFileAccepted} file={file} accept={acceptTypes.lock} operation="lock" />
             {renderPasswordFields(true)}
           </CardContent>
           <CardFooter className="flex-col gap-4">
@@ -237,7 +258,7 @@ export function PdfLocker() {
         </TabsContent>
         <TabsContent value="unlock">
           <CardContent className="space-y-6 pt-6">
-            <FileDropzone onFileAccepted={handleFileAccepted} file={file} />
+            <FileDropzone onFileAccepted={handleFileAccepted} file={file} accept={acceptTypes.unlock} operation="unlock" />
             {renderPasswordFields(false)}
           </CardContent>
           <CardFooter>

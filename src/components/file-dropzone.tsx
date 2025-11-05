@@ -1,16 +1,18 @@
 "use client";
 
 import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
-import { FileUp, File as FileIcon } from "lucide-react";
+import { useDropzone, Accept } from "react-dropzone";
+import { FileUp, File as FileIcon, Unlock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FileDropzoneProps {
   onFileAccepted: (file: File) => void;
   file: File | null;
+  accept: Accept;
+  operation: "lock" | "unlock";
 }
 
-export function FileDropzone({ onFileAccepted, file }: FileDropzoneProps) {
+export function FileDropzone({ onFileAccepted, file, accept, operation }: FileDropzoneProps) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (acceptedFiles.length > 0) {
@@ -22,9 +24,27 @@ export function FileDropzone({ onFileAccepted, file }: FileDropzoneProps) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { "application/pdf": [".pdf"] },
+    accept,
     maxFiles: 1,
   });
+
+  const getHelperText = () => {
+    if (operation === 'lock') {
+        return "Only a single PDF file is accepted";
+    }
+    return "Only .bin files are accepted for unlocking";
+  }
+
+  const getTitleText = () => {
+    if (isDragActive) {
+        return "Drop the file here...";
+    }
+    if (operation === 'lock') {
+        return "Drag 'n' drop a PDF here, or click to select";
+    }
+    return "Drag 'n' drop an encrypted .bin file here";
+  }
+
 
   return (
     <div
@@ -50,13 +70,11 @@ export function FileDropzone({ onFileAccepted, file }: FileDropzoneProps) {
         </div>
       ) : (
         <div className="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400">
-          <FileUp className="w-12 h-12" />
+          {operation === 'lock' ? <FileUp className="w-12 h-12" /> : <Unlock className="w-12 h-12" />}
           <p className="font-semibold">
-            {isDragActive
-              ? "Drop the file here..."
-              : "Drag 'n' drop a PDF here, or click to select"}
+            {getTitleText()}
           </p>
-          <p className="text-sm">Only a single PDF file is accepted</p>
+          <p className="text-sm">{getHelperText()}</p>
         </div>
       )}
     </div>
