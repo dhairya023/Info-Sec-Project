@@ -12,9 +12,7 @@ import { encrypt, decrypt, generatePassword } from "@/lib/crypto";
 import {
   Lock,
   Unlock,
-  Download,
   Loader2,
-  FileText,
   Copy,
   Wand2,
   ShieldCheck,
@@ -39,10 +37,9 @@ export function PdfLocker() {
   const { toast } = useToast();
 
   const handleFileAccepted = (acceptedFile: File) => {
-    const expectedType = activeTab === 'lock' ? 'application/pdf' : 'application/octet-stream';
     const fileExtension = acceptedFile.name.split('.').pop()?.toLowerCase();
 
-    if (activeTab === 'lock' && acceptedFile.type !== expectedType) {
+    if (activeTab === 'lock' && acceptedFile.type !== 'application/pdf') {
         toast({
             title: "Invalid File Type",
             description: "Please upload a valid PDF file for locking.",
@@ -111,14 +108,13 @@ export function PdfLocker() {
 
       if (operation === "lock") {
         outputBuffer = await encrypt(fileBuffer, password);
-        outputFileName = `${file.name}.bin`;
-        // Show the password warning if the passwords match and are not empty
+        outputFileName = `${file.name.replace(/\.pdf$/i, "")}.bin`;
         if (password === confirmPassword && password.length > 0) {
             setGeneratedPassword(password);
         }
       } else {
         outputBuffer = await decrypt(fileBuffer, password);
-        outputFileName = file.name.replace(/\.bin$/, ".pdf");
+        outputFileName = file.name.replace(/\.bin$/i, ".pdf");
         if (!outputFileName.toLowerCase().endsWith('.pdf')) {
           outputFileName += '.pdf';
         }
@@ -162,7 +158,7 @@ export function PdfLocker() {
   const renderPasswordFields = (isLocking: boolean) => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor={isLocking ? "lock-password" : "unlock-password"}>
+        <Label htmlFor={isLocking ? "lock-password" : "unlock-password"} className="text-gray-300">
           Password
         </Label>
         <PasswordInput
@@ -186,7 +182,7 @@ export function PdfLocker() {
         </div>
       )}
       {isLocking && (
-         <Button variant="outline" className="w-full" onClick={handleGeneratePassword} disabled={isProcessing}>
+         <Button variant="outline" className="w-full bg-transparent hover:bg-white/10 text-white" onClick={handleGeneratePassword} disabled={isProcessing}>
             <Wand2 className="mr-2 h-4 w-4" />
             Generate & Copy Secure Password
         </Button>
@@ -203,9 +199,9 @@ export function PdfLocker() {
   }
 
   return (
-    <Card className="w-full bg-white dark:bg-gray-950 shadow-lg border-gray-200 dark:border-gray-800">
+    <Card className="w-full bg-black/30 backdrop-blur-lg shadow-2xl border-purple-500/20">
       <Tabs defaultValue="lock" className="w-full" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-900">
+        <TabsList className="grid w-full grid-cols-2 bg-black/20 m-2 w-[calc(100%-1rem)]">
           <TabsTrigger value="lock">
             <Lock className="mr-2 h-4 w-4" />
             Lock PDF
@@ -234,16 +230,16 @@ export function PdfLocker() {
               Lock & Download
             </Button>
             {generatedPassword && (
-                <div className="mt-4 p-4 bg-yellow-100 dark:bg-yellow-900/50 border border-yellow-300 dark:border-yellow-700 rounded-lg w-full">
+                <div className="mt-4 p-4 bg-purple-900/50 border border-purple-700/50 rounded-lg w-full">
                     <div className="flex items-start">
-                        <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5"/>
+                        <AlertTriangle className="h-5 w-5 text-yellow-400 mr-3 mt-0.5"/>
                         <div>
-                            <h4 className="font-bold text-yellow-800 dark:text-yellow-200">Save Your Password!</h4>
-                            <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                            <h4 className="font-bold text-yellow-200">Save Your Password!</h4>
+                            <p className="text-sm text-yellow-300">
                                 This password cannot be recovered. Keep it safe to unlock your file.
                             </p>
-                            <div className="mt-2 flex items-center gap-2 bg-white dark:bg-gray-800 p-2 rounded-md">
-                                <code className="text-sm text-gray-800 dark:text-gray-200 truncate flex-grow">{generatedPassword}</code>
+                            <div className="mt-2 flex items-center gap-2 bg-black/30 p-2 rounded-md">
+                                <code className="text-sm text-gray-200 truncate flex-grow">{generatedPassword}</code>
                                 <Button size="icon" variant="ghost" onClick={() => {
                                     navigator.clipboard.writeText(generatedPassword);
                                     toast({ title: "Copied to clipboard!" });

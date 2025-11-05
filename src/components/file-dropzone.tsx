@@ -51,27 +51,27 @@ export function FileDropzone({ onFileAccepted, file, accept, operation }: FileDr
       {...getRootProps()}
       className={cn(
         "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
-        "border-gray-300 dark:border-gray-600",
-        "hover:border-gray-500 dark:hover:border-gray-400",
-        "hover:bg-gray-50 dark:hover:bg-gray-800/50",
+        "border-gray-500/30",
+        "hover:border-purple-400/50",
+        "hover:bg-purple-900/20",
         isDragActive
-          ? "border-primary bg-primary/10"
-          : "bg-white dark:bg-gray-900"
+          ? "border-primary bg-primary/20"
+          : "bg-transparent"
       )}
     >
       <input {...getInputProps()} />
       {file ? (
-        <div className="flex flex-col items-center gap-2 text-gray-700 dark:text-gray-300">
+        <div className="flex flex-col items-center gap-2 text-gray-200">
           <FileIcon className="w-12 h-12" />
           <p className="font-medium">{file.name}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-400">
             {(file.size / 1024).toFixed(2)} KB
           </p>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-2 text-gray-500 dark:text-gray-400">
+        <div className="flex flex-col items-center gap-2 text-gray-400">
           {operation === 'lock' ? <FileUp className="w-12 h-12" /> : <Unlock className="w-12 h-12" />}
-          <p className="font-semibold">
+          <p className="font-semibold text-gray-300">
             {getTitleText()}
           </p>
           <p className="text-sm">{getHelperText()}</p>
