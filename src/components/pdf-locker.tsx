@@ -99,7 +99,6 @@ export function PdfLocker() {
     }
 
     setIsProcessing(true);
-    setGeneratedPassword(null);
 
     try {
       const fileBuffer = await file.arrayBuffer();
@@ -109,9 +108,6 @@ export function PdfLocker() {
       if (operation === "lock") {
         outputBuffer = await encrypt(fileBuffer, password);
         outputFileName = `${file.name.replace(/\.pdf$/i, "")}.bin`;
-        if (password === confirmPassword && password.length > 0) {
-            setGeneratedPassword(password);
-        }
       } else {
         outputBuffer = await decrypt(fileBuffer, password);
         outputFileName = file.name.replace(/\.bin$/i, ".pdf");
@@ -158,7 +154,7 @@ export function PdfLocker() {
   const renderPasswordFields = (isLocking: boolean) => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor={isLocking ? "lock-password" : "unlock-password"} className="text-gray-300">
+        <Label htmlFor={isLocking ? "lock-password" : "unlock-password"}>
           Password
         </Label>
         <PasswordInput
@@ -182,7 +178,7 @@ export function PdfLocker() {
         </div>
       )}
       {isLocking && (
-         <Button variant="outline" className="w-full bg-transparent hover:bg-white/10 text-white" onClick={handleGeneratePassword} disabled={isProcessing}>
+         <Button variant="outline" className="w-full" onClick={handleGeneratePassword} disabled={isProcessing}>
             <Wand2 className="mr-2 h-4 w-4" />
             Generate & Copy Secure Password
         </Button>
@@ -199,9 +195,9 @@ export function PdfLocker() {
   }
 
   return (
-    <Card className="w-full bg-black/30 backdrop-blur-lg shadow-2xl border-purple-500/20">
+    <Card className="w-full bg-white dark:bg-black/50 border-gray-200 dark:border-gray-800 shadow-xl">
       <Tabs defaultValue="lock" className="w-full" onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-2 bg-black/20 m-2 w-[calc(100%-1rem)]">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-900/80 m-2 w-[calc(100%-1rem)]">
           <TabsTrigger value="lock">
             <Lock className="mr-2 h-4 w-4" />
             Lock PDF
@@ -230,16 +226,16 @@ export function PdfLocker() {
               Lock & Download
             </Button>
             {generatedPassword && (
-                <div className="mt-4 p-4 bg-purple-900/50 border border-purple-700/50 rounded-lg w-full">
+                <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg w-full">
                     <div className="flex items-start">
-                        <AlertTriangle className="h-5 w-5 text-yellow-400 mr-3 mt-0.5"/>
+                        <AlertTriangle className="h-5 w-5 text-yellow-500 mr-3 mt-0.5"/>
                         <div>
-                            <h4 className="font-bold text-yellow-200">Save Your Password!</h4>
-                            <p className="text-sm text-yellow-300">
+                            <h4 className="font-bold text-gray-900 dark:text-gray-100">Save Your Password!</h4>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                 This password cannot be recovered. Keep it safe to unlock your file.
                             </p>
-                            <div className="mt-2 flex items-center gap-2 bg-black/30 p-2 rounded-md">
-                                <code className="text-sm text-gray-200 truncate flex-grow">{generatedPassword}</code>
+                            <div className="mt-2 flex items-center gap-2 bg-white dark:bg-black/50 p-2 rounded-md">
+                                <code className="text-sm text-gray-800 dark:text-gray-200 truncate flex-grow">{generatedPassword}</code>
                                 <Button size="icon" variant="ghost" onClick={() => {
                                     navigator.clipboard.writeText(generatedPassword);
                                     toast({ title: "Copied to clipboard!" });

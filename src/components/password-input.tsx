@@ -30,9 +30,9 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? (
-            <EyeOff className="h-5 w-5 text-gray-500" />
+            <EyeOff className="h-5 w-5 text-muted-foreground" />
           ) : (
-            <Eye className="h-5 w-5 text-gray-500" />
+            <Eye className="h-5 w-5 text-muted-foreground" />
           )}
         </Button>
       </div>
