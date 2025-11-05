@@ -5,3 +5,13 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+# Required for Next.js preview mode.
+# https://nextjs.org/docs/pages/building-your-application/configuring/cookies
+# Specify a 32 character string.
+# You can generate a new one with `openssl rand -base64 24`
+# server-side-rendering-rewrites
+# Set this to true to have App Hosting update the Next.js server's
+# environment variables with the latest Firebase project configuration.
+# If you don't use server-side-rendering-rewrites then you should update your
+# app's configuration manually.
+setNextjsConfig: true
